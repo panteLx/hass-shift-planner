@@ -1,0 +1,21 @@
+# Compose file for Komodo only
+
+services:
+  hass-shift-planner:
+    build: .
+    container_name: hass-shift-planner
+    environment:
+      - "${PORT:-3000}:${PORT:-3000}"
+      - PORT=${PORT:-3000}
+      - HA_URL=${HA_URL}
+      - HA_TOKEN=${HA_TOKEN}
+      - CALENDAR_ENTITY_IDS=${CALENDAR_ENTITY_IDS}
+    volumes:
+      - ./shifts_config.json:/app/shifts_config.json:ro
+    restart: unless-stopped
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    external: true

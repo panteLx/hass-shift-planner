@@ -84,13 +84,21 @@ A modern web application for planning and importing shifts into Home Assistant c
    }
    ```
 
-4. **Start the application**
+4. **Copy Docker Compose file**
+
+   Copy the example Docker Compose file:
+
+   ```bash
+   cp docker-compose-examples/docker-compose.yaml docker-compose.yaml
+   ```
+
+5. **Start the application**
 
    ```bash
    docker compose up -d
    ```
 
-5. **Access the application**
+6. **Access the application**
 
    Open http://localhost:3000 in your browser
 
@@ -141,29 +149,6 @@ docker compose logs -f
 
 # Restart
 docker compose restart
-```
-
-### Using Docker Only
-
-Build the image:
-
-```bash
-docker build -t hass-shift-planner .
-```
-
-Run the container:
-
-```bash
-docker run -d \
-  --name hass-shift-planner \
-  -p 3000:3000 \
-  -e HOST=0.0.0.0 \
-  -e PORT=3000 \
-  -e HA_URL=http://homeassistant.local:8123 \
-  -e HA_TOKEN=your_token_here \
-  -e CALENDAR_ENTITY_IDS='{"Name 1":"calendar.name1", "Name 2":"calendar.name2"}' \
-  -v $(pwd)/shifts_config.json:/app/shifts_config.json:ro \
-  hass-shift-planner
 ```
 
 ## Configuration Files

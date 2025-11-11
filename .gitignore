@@ -4,3 +4,5 @@ package-lock.json
 *Import_Helper.*
 shifts_config.json
 compose.yaml
+docker-compose.yml
+!docker-compose-examples/*
