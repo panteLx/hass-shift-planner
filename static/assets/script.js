@@ -127,6 +127,7 @@ let selectedDates = new Set();
 let plannedShifts = []; // Array of {name, date, shift_type}
 let currentName = "";
 let currentShiftType = "";
+let isImporting = false; // Flag um Mehrfachimporte zu verhindern
 
 const setupCalendarImport = () => {
   const nameSelect = document.getElementById("calendar-name");
@@ -177,7 +178,14 @@ const setupCalendarImport = () => {
       return;
     }
 
-    // Button deaktivieren, um Mehrfachimporte zu verhindern
+    // Prüfen ob bereits ein Import läuft
+    if (isImporting) {
+      showToast("Import läuft bereits...", "warning");
+      return;
+    }
+
+    // Flag setzen und Button deaktivieren
+    isImporting = true;
     importBtn.disabled = true;
     const originalText =
       importBtn.querySelector("#import-btn-text").textContent;
@@ -210,7 +218,8 @@ const setupCalendarImport = () => {
       console.error("Fehler:", error);
       showToast("Fehler beim Import", "error");
     } finally {
-      // Button wieder aktivieren
+      // Flag zurücksetzen und Button wieder aktivieren
+      isImporting = false;
       importBtn.disabled = plannedShifts.length === 0;
       importBtn.querySelector("#import-btn-text").textContent = originalText;
     }
