@@ -7,71 +7,83 @@
     <title>Schichtplan Import</title>
   </head>
   <body>
-    <h1>Schichtplan Import</h1>
+    <div class="app-header">
+      <h1>📅 Schichtplan Import</h1>
+      <p class="subtitle">
+        Importiere deine Schichten einfach in Home Assistant
+      </p>
+    </div>
+
     <div class="container">
-      <div class="button-container">
-        <button id="show-single-form">Einzelimport</button>
-        <button id="show-batch-form">Batch-Import</button>
+      <!-- Kalender-Ansicht Tab -->
+      <div id="calendar-tab" class="tab-content active">
+        <div class="card">
+          <h2>Kalender-Import</h2>
+          <div class="calendar-import">
+            <div class="calendar-controls">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="calendar-name">
+                    <span class="label-icon">👤</span>
+                    Name
+                  </label>
+                  <select id="calendar-name" name="name" required>
+                    <option value="">Bitte auswählen</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="calendar-shift-type">
+                    <span class="label-icon">🕐</span>
+                    Schichttyp
+                  </label>
+                  <select id="calendar-shift-type" name="shift_type" required>
+                    <option value="">Bitte auswählen</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div id="shift-legend" class="shift-legend"></div>
+
+            <div id="calendar-container" class="calendar"></div>
+
+            <div class="selected-shifts-container">
+              <div class="selected-shifts-header">
+                <h3>Geplante Schichten (<span id="selected-count">0</span>)</h3>
+                <button type="button" id="clear-all-shifts" class="btn-text">
+                  Alle löschen
+                </button>
+              </div>
+              <div id="selected-shifts" class="selected-shifts"></div>
+              <button
+                type="button"
+                id="import-calendar-shifts"
+                class="btn btn-primary btn-large"
+                disabled
+              >
+                <span class="btn-icon">📤</span>
+                <span id="import-btn-text">Alle Schichten importieren</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Formular für Einzelne Schicht -->
-      <div id="single-form" class="hidden">
-        <h2>Einzelne Schicht hinzufügen</h2>
-        <form id="shift-form">
-          <div class="form-group">
-            <label for="name">Name:</label>
-            <select id="name" name="name" required>
-              <option value="">Bitte auswählen</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="date">Datum (YYYY-MM-DD):</label>
-            <input type="date" id="date" name="date" required />
-          </div>
-          <div class="form-group">
-            <label for="shift_type">Schichttyp:</label>
-            <select id="shift_type" name="shift_type" required>
-              <option value="">Bitte auswählen</option>
-            </select>
-          </div>
-          <input type="submit" value="Einzeln hinzufügen" />
-        </form>
-      </div>
+      <!-- Toast Notifications -->
+      <div id="toast-container" class="toast-container"></div>
 
-      <!-- Formular für Batch-Import -->
-      <div id="batch-form" class="hidden">
-        <h2>Batch-Import von Schichten</h2>
-        <form id="batch-form">
-          <div class="form-group">
-            <label for="batch-name">Name:</label>
-            <select id="batch-name" name="name" required>
-              <option value="">Bitte auswählen</option>
-            </select>
+      <!-- Response Container -->
+      <div id="response-container" class="response-container hidden">
+        <div class="card">
+          <div class="response-header">
+            <h2>Import-Ergebnis</h2>
+            <button id="close-response" class="btn-close">✕</button>
           </div>
-          <div class="form-group">
-            <label for="batch-shifts"
-              >Schichten (Format: DD.MM:Schichttyp, z.B. 06.08:Früh):</label
-            >
-            <textarea
-              id="batch-shifts"
-              name="batch-shifts"
-              rows="10"
-              required
-            ></textarea>
-          </div>
-          <div id="available-shift-types">
-            <!-- Hier werden die verfügbaren Schichten angezeigt -->
-          </div>
-          <input type="submit" value="Batch hinzufügen" />
-        </form>
-      </div>
-
-      <!-- Antwort-Container -->
-      <div id="response-container" class="hidden">
-        <h2>Antwort:</h2>
-        <pre id="response" class="response"></pre>
+          <div id="response" class="response"></div>
+        </div>
       </div>
     </div>
+
+    <script src="/assets/script.js"></script>
   </body>
-  <script src="/assets/script.js"></script>
 </html>

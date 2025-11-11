@@ -71,7 +71,9 @@ app.get("/api/options", (req, res) => {
 app.get("/api/shift_types/:name", (req, res) => {
   const rawName = req.params.name.toLowerCase();
   if (shifts[rawName]) {
-    const shiftTypes = Object.keys(shifts[rawName]);
+    const shiftTypes = Object.keys(shifts[rawName]).map((shiftType) =>
+      formatShiftType(shiftType)
+    );
     res.json({ shift_types: shiftTypes });
   } else {
     res.status(404).json({ shift_types: [] });
