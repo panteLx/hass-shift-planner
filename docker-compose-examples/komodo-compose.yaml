@@ -2,7 +2,7 @@
 
 services:
   hass-shift-planner:
-    build: ./
+    build: .
     container_name: hass-shift-planner
     environment:
       - "${PORT:-3000}:${PORT:-3000}"
