@@ -53,7 +53,11 @@ A modern web application for planning and importing shifts into Home Assistant c
 
 3. **Configure shift types**
 
-   Edit and rename `shifts_config-example.json` to `shifts_config.json` with your shift times:
+   Copy, edit and rename `shifts_config.json.example` to `shifts_config.json` with your shift times:
+
+   ```bash
+   cp shifts_config.json.example shifts_config.json
+   ```
 
    ```json
    {
