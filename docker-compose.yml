@@ -1,0 +1,15 @@
+services:
+  hass-import-shifts:
+    build: .
+    container_name: hass-import-shifts
+    ports:
+      - "3000:3000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+      - HA_URL=${HA_URL}
+      - HA_TOKEN=${HA_TOKEN}
+      - CALENDAR_ENTITY_IDS=${CALENDAR_ENTITY_IDS}
+    volumes:
+      - ./shifts_config.json:/app/shifts_config.json:ro
+    restart: unless-stopped
