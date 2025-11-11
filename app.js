@@ -80,6 +80,21 @@ app.get("/api/shift_types/:name", (req, res) => {
   }
 });
 
+// API: Schichtdetails für einen bestimmten Namen abrufen
+app.get("/api/shift_details/:name", (req, res) => {
+  const rawName = req.params.name.toLowerCase();
+  if (shifts[rawName]) {
+    const shiftDetails = {};
+    Object.entries(shifts[rawName]).forEach(([rawShiftType, times]) => {
+      const formattedShiftType = formatShiftType(rawShiftType);
+      shiftDetails[formattedShiftType] = times;
+    });
+    res.json(shiftDetails);
+  } else {
+    res.status(404).json({});
+  }
+});
+
 // API: Schichten hinzufügen
 app.post("/add_shifts", async (req, res) => {
   const shiftsData = req.body;

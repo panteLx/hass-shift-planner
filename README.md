@@ -1,14 +1,19 @@
 # Home Assistant Shift Planner
 
-A modern web application for planning and importing shifts into Home Assistant calendars with an intuitive calendar interface.
+A modern web application for planning and importing shifts into Home Assistant calendars with an intuitive calendar interface and intelligent shift categorization.
 
 ## Features
 
-- 📅 **Interactive Calendar View** - Visual shift planning with color-coded shift types
+- 📅 **Interactive Calendar View** - Visual shift planning with modern horizontal shift badges
 - 👥 **Multi-Person Support** - Plan shifts for multiple people simultaneously
-- 🎨 **Automatic Color Coding** - Predefined colors for common shifts, automatic generation for custom types
+- 🎨 **Intelligent Color Grouping** - Automatic categorization into Morning, Day, Evening, Night, and Special shifts
+- 🏷️ **Manual Categorization** - Define custom categories in JSON configuration for precise control
+- 📋 **Enhanced Shift Selection** - Dropdown menus show shift times, duration, and color-coded options
+- 🗂️ **Grouped Legend** - Organized shift legend with icons and categories for better overview
+- 🎯 **Flexible Shift Recognition** - Supports both time-based and name-based shift categorization
 - 🌙 **Dark Theme** - Modern dark interface for comfortable viewing
 - 🔄 **Real-time Updates** - Shifts sync immediately with Home Assistant calendars
+- 📱 **Responsive Design** - Works perfectly on desktop, tablet, and mobile devices
 - 🐳 **Docker Ready** - Easy deployment with Docker and Docker Compose
 
 ## Quick Start
@@ -53,7 +58,7 @@ A modern web application for planning and importing shifts into Home Assistant c
 
 3. **Configure shift types**
 
-   Copy, edit and rename `shifts_config.json.example` to `shifts_config.json` with your shift times:
+   Copy, edit and rename `shifts_config.json.example` to `shifts_config.json` with your shift times and categories:
 
    ```bash
    cp shifts_config.json.example shifts_config.json
@@ -61,32 +66,43 @@ A modern web application for planning and importing shifts into Home Assistant c
 
    ```json
    {
-     "Name 1": {
-       "Shift 1": {
+     "sebastian": {
+       "früh": {
          "start": "06:00:00",
-         "end": "14:00:00"
+         "end": "14:00:00",
+         "category": "morning"
        },
-       "Shift 2": {
-         "start": "14:00:00",
-         "end": "22:00:00"
+       "mittel": {
+         "start": "10:00:00",
+         "end": "18:00:00",
+         "category": "day"
        },
-       "Shift 3": {
-         "start": "22:00:00",
-         "end": "06:00:00"
-       }
-     },
-     "Name 2": {
-       "Shift 1 ": {
-         "start": "07:00:00",
-         "end": "15:00:00"
+       "spät": {
+         "start": "13:00:00",
+         "end": "21:00:00",
+         "category": "evening"
        },
-       "Shift 2": {
-         "start": "15:00:00",
-         "end": "23:00:00"
+       "nacht": {
+         "start": "20:45:00",
+         "end": "23:59:00",
+         "category": "night"
+       },
+       "fortbildung": {
+         "start": "08:00:00",
+         "end": "16:00:00",
+         "category": "special"
        }
      }
    }
    ```
+
+   **Categories:**
+
+   - `morning` 🌅 - Morning shifts (green colors)
+   - `day` ☀️ - Day shifts (blue colors)
+   - `evening` 🌆 - Evening/late shifts (orange colors)
+   - `night` 🌙 - Night shifts (purple colors)
+   - `special` ⭐ - Special shifts like training, vacation (various colors)
 
 4. **Copy Docker Compose file**
 
@@ -116,16 +132,26 @@ A modern web application for planning and importing shifts into Home Assistant c
 4. Click again on a day to remove that specific shift
 5. **Submit planned shifts** to sync with Home Assistant
 
-### Color Coding
+### Shift Categories and Color Coding
 
-The calendar automatically color-codes shifts:
+The application uses intelligent categorization with manual control:
 
-- **Früh/Frühschicht** (Early shift) - Green
-- **Spät/Spätschicht** (Late shift) - Orange
-- **Nacht/Nachtschicht** (Night shift) - Indigo
-- **Custom shifts** - Automatically generated consistent colors
+#### Manual Categorization (Recommended)
 
-The legend below the calendar shows all active shift types with their colors.
+Define categories in your `shifts_config.json`:
+
+- 🌅 **Morning shifts** (`"category": "morning"`) - Green tones
+- ☀️ **Day shifts** (`"category": "day"`) - Blue tones
+- 🌆 **Evening shifts** (`"category": "evening"`) - Orange tones
+- 🌙 **Night shifts** (`"category": "night"`) - Purple tones
+- ⭐ **Special shifts** (`"category": "special"`) - Various colors for training, vacation, etc.
+
+#### Automatic Fallback
+
+For shifts without manual categories, the system uses:
+
+- **Time-based detection** - Categorizes by shift start times
+- **Keyword recognition** - Recognizes common patterns like "früh", "spät", "nacht"
 
 ### Multi-Person Planning
 
@@ -159,14 +185,44 @@ docker compose restart
 
 ### shifts_config.json
 
-Defines shift times for each person and shift type. Structure:
+Defines shift times, categories, and configurations for each person. Enhanced structure with manual categorization:
 
 ```json
 {
   "PersonName": {
     "ShiftType": {
       "start": "HH:MM:SS",
-      "end": "HH:MM:SS"
+      "end": "HH:MM:SS",
+      "category": "morning|day|evening|night|special"
+    }
+  }
+}
+```
+
+**Example with complex shifts:**
+
+```json
+{
+  "lisa": {
+    "früh": {
+      "start": "07:45:00",
+      "end": "15:45:00",
+      "category": "morning"
+    },
+    "mittel-1": {
+      "start": "10:00:00",
+      "end": "18:00:00",
+      "category": "day"
+    },
+    "mittel-2": {
+      "start": "11:00:00",
+      "end": "19:00:00",
+      "category": "evening"
+    },
+    "spät-1": {
+      "start": "12:15:00",
+      "end": "20:10:00",
+      "category": "evening"
     }
   }
 }
@@ -236,6 +292,8 @@ docker exec -it hass-shift-planner sh
 
 - **Backend**: Node.js, Express
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
+- **UI/UX**: Modern dark theme, responsive flexbox layouts, horizontal shift badges
+- **Data Management**: JSON-based configuration with caching
 - **Container**: Docker, Docker Compose
 - **Integration**: Home Assistant REST API
 

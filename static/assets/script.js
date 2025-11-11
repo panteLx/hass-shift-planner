@@ -32,49 +32,109 @@ const formatDate = (dateStr) => {
   });
 };
 
-// Color assignment for shift types
-const shiftColors = {
-  // Predefined colors for common shift types
-  frühschicht: "#10b981",
-  früh: "#10b981",
-  morning: "#10b981",
-  spätschicht: "#f59e0b",
-  spät: "#f59e0b",
-  late: "#f59e0b",
-  nachtschicht: "#6366f1",
-  nacht: "#6366f1",
-  night: "#6366f1",
-  tagschicht: "#3b82f6",
-  tag: "#3b82f6",
-  day: "#3b82f6",
+// Enhanced color system for shift types with better grouping
+const shiftColorGroups = {
+  // Morning shifts - Green tones
+  morning: {
+    colors: ["#10b981", "#059669", "#065f46", "#16a34a", "#15803d"],
+    keywords: ["früh", "morning", "morgen"],
+  },
+  // Day/Mid shifts - Blue tones
+  day: {
+    colors: ["#3b82f6", "#2563eb", "#1d4ed8", "#0ea5e9", "#0284c7"],
+    keywords: ["tag", "day"],
+  },
+  // Evening/Late shifts - Orange/Yellow tones
+  evening: {
+    colors: ["#f59e0b", "#d97706", "#b45309", "#f97316", "#ea580c"],
+    keywords: ["spät", "late", "abend", "evening"],
+  },
+  // Night shifts - Purple/Indigo tones
+  night: {
+    colors: ["#6366f1", "#4f46e5", "#4338ca", "#7c3aed", "#6d28d9"],
+    keywords: ["nacht", "night"],
+  },
+  // Special shifts - Various colors
+  special: {
+    colors: [
+      "#ef4444",
+      "#dc2626",
+      "#b91c1c",
+      "#14b8a6",
+      "#0d9488",
+      "#ec4899",
+      "#be185d",
+    ],
+    keywords: [
+      "fortbildung",
+      "training",
+      "urlaub",
+      "vacation",
+      "krank",
+      "sick",
+      "frei",
+      "free",
+      "bereitschaft",
+    ],
+  },
 };
 
-const getShiftColor = (shiftType) => {
+const detectShiftGroup = (shiftType, shiftTimes = null) => {
   const normalized = shiftType.toLowerCase();
 
-  // Check if we have a predefined color
-  if (shiftColors[normalized]) {
-    return shiftColors[normalized];
+  // FIRST: Check if we have a manual category in the shift data
+  if (shiftTimes && shiftTimes.category) {
+    return shiftTimes.category;
   }
 
-  // Generate a consistent color based on shift type name
+  // FALLBACK: Use keyword-based detection for unknown shifts
+  // Check for special shift keywords first
+  if (
+    shiftColorGroups.special.keywords.some((keyword) =>
+      normalized.includes(keyword)
+    )
+  ) {
+    return "special";
+  }
+
+  // Check other keywords
+  for (const [group, config] of Object.entries(shiftColorGroups)) {
+    if (
+      group !== "special" &&
+      config.keywords.some((keyword) => normalized.includes(keyword))
+    ) {
+      return group;
+    }
+  }
+
+  return "special"; // Default fallback
+};
+
+const getShiftColor = (shiftType, shiftTimes = null) => {
+  const group = detectShiftGroup(shiftType, shiftTimes);
+  const colorGroup = shiftColorGroups[group];
+
+  // Generate consistent color within the group based on shift name
   let hash = 0;
-  for (let i = 0; i < normalized.length; i++) {
-    hash = normalized.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < shiftType.length; i++) {
+    hash = shiftType.charCodeAt(i) + ((hash << 5) - hash);
   }
 
-  const colors = [
-    "#ef4444",
-    "#f97316",
-    "#84cc16",
-    "#06b6d4",
-    "#8b5cf6",
-    "#ec4899",
-    "#14b8a6",
-    "#f43f5e",
-  ];
+  const colorIndex = Math.abs(hash) % colorGroup.colors.length;
+  return colorGroup.colors[colorIndex];
+};
 
-  return colors[Math.abs(hash) % colors.length];
+// Get group info for display purposes
+const getShiftGroupInfo = (shiftType, shiftTimes = null) => {
+  const group = detectShiftGroup(shiftType, shiftTimes);
+  const groupNames = {
+    morning: { name: "Frühschicht", icon: "🌅" },
+    day: { name: "Tagschicht", icon: "☀️" },
+    evening: { name: "Spätschicht", icon: "🌆" },
+    night: { name: "Nachtschicht", icon: "🌙" },
+    special: { name: "Sondertermin", icon: "⭐" },
+  };
+  return groupNames[group] || groupNames.special;
 };
 
 // API Functions
@@ -106,12 +166,80 @@ const fetchShiftTypes = async (name, targetSelect) => {
     const response = await fetch(`/api/shift_types/${name.toLowerCase()}`);
     const data = await response.json();
 
+    // Check cache first, then fetch shift details for better display
+    let shiftDetails = shiftDetailsCache[name.toLowerCase()];
+    if (!shiftDetails) {
+      try {
+        const detailsResponse = await fetch(
+          `/api/shift_details/${name.toLowerCase()}`
+        );
+        shiftDetails = detailsResponse.ok ? await detailsResponse.json() : {};
+        shiftDetailsCache[name.toLowerCase()] = shiftDetails; // Cache the result
+      } catch (error) {
+        console.error("Fehler beim Abrufen der Schichtdetails:", error);
+        shiftDetails = {};
+      }
+    }
+
     targetSelect.innerHTML = '<option value="">Bitte auswählen</option>';
+
+    // Group shifts by type for better organization
+    const groupedShifts = {};
     data.shift_types.forEach((shiftType) => {
-      const option = document.createElement("option");
-      option.value = shiftType;
-      option.textContent = shiftType;
-      targetSelect.appendChild(option);
+      const shiftTimes = shiftDetails[shiftType];
+      const groupInfo = getShiftGroupInfo(shiftType, shiftTimes);
+
+      if (!groupedShifts[groupInfo.name]) {
+        groupedShifts[groupInfo.name] = [];
+      }
+
+      groupedShifts[groupInfo.name].push({
+        type: shiftType,
+        times: shiftTimes,
+        color: getShiftColor(shiftType, shiftTimes),
+      });
+    });
+
+    // Add options grouped by shift category
+    Object.entries(groupedShifts).forEach(([groupName, shifts]) => {
+      if (shifts.length > 1) {
+        const optgroup = document.createElement("optgroup");
+        optgroup.label = groupName;
+        targetSelect.appendChild(optgroup);
+
+        shifts.forEach(({ type, times, color }) => {
+          const option = document.createElement("option");
+          option.value = type;
+
+          let displayText = type;
+          if (times && times.start && times.end) {
+            const duration = calculateShiftDuration(times.start, times.end);
+            displayText = `${type} (${times.start} - ${times.end}, ${duration}h)`;
+          }
+
+          option.textContent = displayText;
+          option.style.color = color;
+          option.dataset.times = times ? JSON.stringify(times) : "";
+          optgroup.appendChild(option);
+        });
+      } else {
+        // Single shift in group, add directly
+        shifts.forEach(({ type, times, color }) => {
+          const option = document.createElement("option");
+          option.value = type;
+
+          let displayText = type;
+          if (times && times.start && times.end) {
+            const duration = calculateShiftDuration(times.start, times.end);
+            displayText = `${type} (${times.start} - ${times.end}, ${duration}h)`;
+          }
+
+          option.textContent = displayText;
+          option.style.color = color;
+          option.dataset.times = times ? JSON.stringify(times) : "";
+          targetSelect.appendChild(option);
+        });
+      }
     });
 
     return data.shift_types;
@@ -121,6 +249,23 @@ const fetchShiftTypes = async (name, targetSelect) => {
   }
 };
 
+// Helper function to calculate shift duration
+const calculateShiftDuration = (startTime, endTime) => {
+  const [startHours, startMinutes] = startTime.split(":").map(Number);
+  const [endHours, endMinutes] = endTime.split(":").map(Number);
+
+  let start = startHours + startMinutes / 60;
+  let end = endHours + endMinutes / 60;
+
+  // Handle overnight shifts (end time is next day)
+  if (end <= start) {
+    end += 24;
+  }
+
+  const duration = end - start;
+  return duration.toFixed(1);
+};
+
 // Calendar Import
 let currentDate = new Date();
 let selectedDates = new Set();
@@ -128,6 +273,16 @@ let plannedShifts = []; // Array of {name, date, shift_type}
 let currentName = "";
 let currentShiftType = "";
 let isImporting = false; // Flag um Mehrfachimporte zu verhindern
+let shiftDetailsCache = {}; // Cache for shift times to avoid repeated API calls
+
+// Helper function to get shift details from cache
+const getShiftDetails = (personName, shiftType) => {
+  const cachedDetails = shiftDetailsCache[personName.toLowerCase()];
+  if (cachedDetails && cachedDetails[shiftType]) {
+    return cachedDetails[shiftType];
+  }
+  return null;
+};
 
 const setupCalendarImport = () => {
   const nameSelect = document.getElementById("calendar-name");
@@ -239,18 +394,74 @@ const updateShiftLegend = () => {
   }
 
   legendContainer.style.display = "block";
-  let html =
-    '<div class="legend-title">Legende:</div><div class="legend-items">';
 
-  uniqueShiftTypes.sort().forEach((shiftType) => {
-    const color = getShiftColor(shiftType);
-    html += `<div class="legend-item">
-      <div class="legend-color" style="background-color: ${color}"></div>
-      <span>${shiftType}</span>
-    </div>`;
+  // Group shifts by type for better organization
+  const groupedShifts = {};
+  uniqueShiftTypes.forEach((shiftType) => {
+    // Try to find a planned shift with this type to get the person name
+    const sampleShift = plannedShifts.find((s) => s.shift_type === shiftType);
+    const shiftDetails = sampleShift
+      ? getShiftDetails(sampleShift.name, shiftType)
+      : null;
+
+    const groupInfo = getShiftGroupInfo(shiftType, shiftDetails);
+    const color = getShiftColor(shiftType, shiftDetails);
+
+    if (!groupedShifts[groupInfo.name]) {
+      groupedShifts[groupInfo.name] = {
+        icon: groupInfo.icon,
+        shifts: [],
+      };
+    }
+
+    groupedShifts[groupInfo.name].shifts.push({
+      type: shiftType,
+      color: color,
+    });
   });
 
-  html += "</div>";
+  let html = '<div class="legend-title">Schichtlegende:</div>';
+
+  // Sort groups by typical shift order
+  const groupOrder = [
+    "Frühschicht",
+    "Tagschicht",
+    "Spätschicht",
+    "Nachtschicht",
+    "Sondertermin",
+  ];
+  const sortedGroups = Object.keys(groupedShifts).sort((a, b) => {
+    const indexA = groupOrder.indexOf(a);
+    const indexB = groupOrder.indexOf(b);
+    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
+  sortedGroups.forEach((groupName) => {
+    const group = groupedShifts[groupName];
+
+    html += `<div class="legend-group">
+      <div class="legend-group-header">
+        <span class="legend-group-icon">${group.icon}</span>
+        <span class="legend-group-name">${groupName}</span>
+      </div>
+      <div class="legend-items">`;
+
+    // Sort shifts within group alphabetically
+    group.shifts.sort((a, b) => a.type.localeCompare(b.type));
+
+    group.shifts.forEach(({ type, color }) => {
+      html += `<div class="legend-item">
+        <div class="legend-color" style="background-color: ${color}"></div>
+        <span>${type}</span>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
   legendContainer.innerHTML = html;
 };
 
@@ -330,13 +541,22 @@ const renderCalendar = () => {
     if (shiftsForDate.length > 0) classes += " has-shifts";
     if (isPast) classes += " disabled";
 
-    // Create shift badges
+    // Create shift badges with enhanced information
     let shiftBadges = "";
     if (shiftsForDate.length > 0) {
       shiftsForDate.forEach((shift) => {
-        const color = getShiftColor(shift.shift_type);
+        const shiftDetails = getShiftDetails(shift.name, shift.shift_type);
+        const color = getShiftColor(shift.shift_type, shiftDetails);
         const initial = shift.name.charAt(0).toUpperCase();
-        shiftBadges += `<div class="shift-badge" style="background-color: ${color}" title="${shift.name}: ${shift.shift_type}">${initial}</div>`;
+        const groupInfo = getShiftGroupInfo(shift.shift_type, shiftDetails);
+
+        // Enhanced tooltip with more information
+        const tooltipInfo = `${shift.name}: ${shift.shift_type} (${groupInfo.name})`;
+
+        shiftBadges += `<div class="shift-badge" style="background-color: ${color}" title="${tooltipInfo}" data-shift-group="${groupInfo.name}">
+          <span class="shift-icon">${groupInfo.icon}</span>
+          <span class="shift-initial">${initial}</span>
+        </div>`;
       });
     }
 
@@ -484,9 +704,20 @@ const updatePlannedShiftsDisplay = () => {
       const typeShifts = groupedByShiftType[shiftType];
       typeShifts.sort((a, b) => a.date.localeCompare(b.date));
 
+      // Use the first shift of this type to get the person name for shift details lookup
+      const sampleShift = typeShifts[0];
+      const shiftDetails = getShiftDetails(sampleShift.name, shiftType);
+
+      const color = getShiftColor(shiftType, shiftDetails);
+      const groupInfo = getShiftGroupInfo(shiftType, shiftDetails);
+
       html += `<div class="shift-type-group">
         <div class="shift-type-header">
-          <span>🕐 ${shiftType}</span>
+          <div class="shift-type-info">
+            <div class="shift-type-indicator" style="background-color: ${color}"></div>
+            <span class="shift-type-icon">${groupInfo.icon}</span>
+            <span class="shift-type-name">${shiftType}</span>
+          </div>
           <span class="shift-type-count">${typeShifts.length}x</span>
         </div>
         <div class="shift-dates">`;
@@ -494,7 +725,9 @@ const updatePlannedShiftsDisplay = () => {
       typeShifts.forEach((shift) => {
         html += `
           <div class="shift-date-item">
-            <span>${formatDate(shift.date)}</span>
+            <div class="shift-date-info">
+              <span class="shift-date">${formatDate(shift.date)}</span>
+            </div>
             <button class="btn-remove" onclick="removeShiftByIndex(${
               shift.index
             })" title="Entfernen">×</button>

@@ -185,6 +185,24 @@ textarea:focus {
 select option {
   background: var(--card-bg);
   color: var(--text-primary);
+  padding: 8px 12px;
+}
+
+select optgroup {
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+select optgroup option {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  font-weight: normal;
+  margin-left: 8px;
 }
 
 textarea {
@@ -398,28 +416,68 @@ textarea {
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-primary);
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.legend-group {
+  margin-bottom: 16px;
+}
+
+.legend-group:last-child {
+  margin-bottom: 0;
+}
+
+.legend-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.legend-group-icon {
+  font-size: 1rem;
+}
+
+.legend-group-name {
+  font-weight: 500;
 }
 
 .legend-items {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
+  padding-left: 24px;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.legend-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-color);
 }
 
 .legend-color {
-  width: 20px;
-  height: 16px;
+  width: 18px;
+  height: 14px;
   border-radius: 3px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .calendar {
@@ -477,7 +535,7 @@ textarea {
 }
 
 .calendar-day {
-  min-height: 80px;
+  min-height: 90px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -488,8 +546,10 @@ textarea {
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
-  padding: 4px;
+  padding: 5px;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .calendar-day:hover:not(.disabled):not(.other-month) {
@@ -533,25 +593,49 @@ textarea {
   gap: 2px;
   width: 100%;
   margin-top: auto;
+  align-items: flex-start;
+  justify-content: flex-start;
+  overflow: hidden;
 }
 
 .shift-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
   font-size: 0.7rem;
   font-weight: 600;
   color: white;
-  padding: 2px 4px;
-  border-radius: 3px;
+  padding: 3px 6px;
+  border-radius: 10px;
   line-height: 1;
-  min-width: 18px;
-  text-align: center;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  min-width: 35px;
+  min-height: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   transition: all 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .shift-badge:hover {
-  transform: scale(1.1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.shift-initial {
+  font-weight: 700;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.shift-icon {
+  font-size: 0.7rem;
+  line-height: 1;
+  opacity: 0.9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 /* Planned Shifts Display */
@@ -631,13 +715,31 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background: var(--bg-color);
   border-radius: var(--radius-sm);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  border-left: 3px solid transparent;
 }
 
-.shift-type-header span:first-child {
+.shift-type-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shift-type-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.shift-type-icon {
+  font-size: 1rem;
+}
+
+.shift-type-name {
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -645,6 +747,9 @@ textarea {
 .shift-type-count {
   font-size: 0.85rem;
   color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 8px;
+  border-radius: 12px;
 }
 
 .shift-dates {
@@ -961,8 +1066,8 @@ textarea {
   }
 
   .calendar-day {
-    min-height: 70px;
-    padding: 3px;
+    min-height: 80px;
+    padding: 4px;
   }
 
   .day-number {
@@ -970,8 +1075,19 @@ textarea {
   }
 
   .shift-badge {
+    min-width: 32px;
+    min-height: 18px;
+    padding: 2px 4px;
+    gap: 2px;
     font-size: 0.65rem;
-    padding: 1px 3px;
+  }
+
+  .shift-initial {
+    font-size: 0.65rem;
+  }
+
+  .shift-icon {
+    font-size: 0.65rem;
   }
 
   .legend-items {

@@ -2,69 +2,85 @@
   "sebastian": {
     "früh": {
       "start": "06:00:00",
-      "end": "14:00:00"
+      "end": "14:00:00",
+      "category": "morning"
     },
-    "tag": {
+    "mittel": {
       "start": "10:00:00",
-      "end": "18:00:00"
+      "end": "18:00:00",
+      "category": "day"
     },
     "spät": {
       "start": "13:00:00",
-      "end": "21:00:00"
+      "end": "21:00:00",
+      "category": "evening"
     },
     "nacht": {
       "start": "20:45:00",
-      "end": "23:59:00"
+      "end": "23:59:00",
+      "category": "night"
     },
     "fortbildung": {
       "start": "08:00:00",
-      "end": "16:00:00"
+      "end": "16:00:00",
+      "category": "special"
     }
   },
   "lisa": {
     "früh": {
       "start": "07:45:00",
-      "end": "15:45:00"
+      "end": "15:45:00",
+      "category": "morning"
     },
     "mittel-1": {
       "start": "10:00:00",
-      "end": "18:00:00"
+      "end": "18:00:00",
+      "category": "day"
     },
     "mittel-2": {
       "start": "11:00:00",
-      "end": "19:00:00"
+      "end": "19:00:00",
+      "category": "day"
     },
     "mittel-3": {
       "start": "10:30:00",
-      "end": "19:00:00"
+      "end": "19:00:00",
+      "category": "day"
     },
     "mittel-4": {
       "start": "09:00:00",
-      "end": "17:00:00"
+      "end": "17:00:00",
+      "category": "day"
     },
     "mittel-5": {
       "start": "09:30:00",
-      "end": "17:30:00"
+      "end": "17:30:00",
+      "category": "day"
     },
     "spät-1": {
       "start": "12:15:00",
-      "end": "20:10:00"
+      "end": "20:10:00",
+      "category": "evening"
     },
     "spät-2": {
       "start": "11:00:00",
-      "end": "20:10:00"
+      "end": "20:10:00",
+      "category": "evening"
     },
     "spät-3": {
       "start": "12:30:00",
-      "end": "20:10:00"
+      "end": "20:10:00",
+      "category": "evening"
     },
     "spät-4": {
       "start": "12:00:00",
-      "end": "20:10:00"
+      "end": "20:10:00",
+      "category": "evening"
     },
     "spät-5": {
       "start": "14:00:00",
-      "end": "20:10:00"
+      "end": "20:10:00",
+      "category": "evening"
     }
   }
 }
