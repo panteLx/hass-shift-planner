@@ -1,6 +1,3 @@
-# Compose file for everything else but Komodo
-# Delete the file if deploying to Komodo
-
 services:
   hass-shift-planner:
     build: .
