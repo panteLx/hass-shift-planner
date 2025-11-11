@@ -800,4 +800,26 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchOptions();
   updatePlannedShiftsDisplay();
   renderCalendar();
+  setupMobileWarning();
 });
+
+// Setup mobile warning functionality
+const setupMobileWarning = () => {
+  const dismissBtn = document.getElementById("dismiss-mobile-warning");
+  const warning = document.getElementById("mobile-warning");
+
+  if (dismissBtn && warning) {
+    dismissBtn.addEventListener("click", () => {
+      warning.style.display = "none";
+      document.body.style.paddingTop = "20px";
+      // Remember user's choice in localStorage
+      localStorage.setItem("mobileWarningDismissed", "true");
+    });
+
+    // Check if user previously dismissed the warning
+    if (localStorage.getItem("mobileWarningDismissed") === "true") {
+      warning.style.display = "none";
+      document.body.style.paddingTop = "20px";
+    }
+  }
+};

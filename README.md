@@ -13,7 +13,7 @@ A modern web application for planning and importing shifts into Home Assistant c
 - 🎯 **Flexible Shift Recognition** - Supports both time-based and name-based shift categorization
 - 🌙 **Dark Theme** - Modern dark interface for comfortable viewing
 - 🔄 **Real-time Updates** - Shifts sync immediately with Home Assistant calendars
-- 📱 **Responsive Design** - Works perfectly on desktop, tablet, and mobile devices
+- 📱 **Responsive Design** - Works perfectly on desktop and tablet. Mobile devices (WIP)
 - 🐳 **Docker Ready** - Easy deployment with Docker and Docker Compose
 
 ## Quick Start

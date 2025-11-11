@@ -1025,6 +1025,70 @@ textarea {
   display: none !important;
 }
 
+/* Mobile Warning */
+.mobile-warning {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--warning-color);
+  color: #1f2937;
+  box-shadow: var(--shadow-md);
+}
+
+.mobile-warning-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.warning-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.warning-text {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.warning-text strong {
+  font-weight: 600;
+}
+
+.warning-dismiss {
+  background: none;
+  border: none;
+  color: #1f2937;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.warning-dismiss:hover {
+  background: rgba(31, 41, 55, 0.1);
+}
+
+/* Show mobile warning only on mobile devices */
+@media (max-width: 768px) {
+  .mobile-warning {
+    display: block;
+  }
+
+  body {
+    padding-top: 60px; /* Add space for the warning banner */
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   body {
