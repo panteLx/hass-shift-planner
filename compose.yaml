@@ -1,14 +1,12 @@
-# Compose file for everything else but Komodo
-# Delete the file if deploying to Komodo
+# Compose file for Komodo only
+# Delete this file if deploying elsewhere
 
 services:
   hass-shift-planner:
     build: .
     container_name: hass-shift-planner
-    ports:
-      - "${PORT:-3000}:${PORT:-3000}"
     environment:
-      - HOST=${HOST:-0.0.0.0}
+      - "${PORT:-3000}:${PORT:-3000}"
       - PORT=${PORT:-3000}
       - HA_URL=${HA_URL}
       - HA_TOKEN=${HA_TOKEN}
@@ -16,3 +14,9 @@ services:
     volumes:
       - ./shifts_config.json:/app/shifts_config.json:ro
     restart: unless-stopped
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    external: true

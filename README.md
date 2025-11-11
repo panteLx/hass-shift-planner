@@ -1,108 +1,183 @@
-# Home Assistant Shift Import
+# Home Assistant Shift Planner
 
-Eine Web-Anwendung zum Importieren von Schichtplänen in Home Assistant Kalender.
+A modern web application for planning and importing shifts into Home Assistant calendars with an intuitive calendar interface.
 
-## Docker Installation
+## Features
 
-### Voraussetzungen
+- 📅 **Interactive Calendar View** - Visual shift planning with color-coded shift types
+- 👥 **Multi-Person Support** - Plan shifts for multiple people simultaneously
+- 🎨 **Automatic Color Coding** - Predefined colors for common shifts, automatic generation for custom types
+- 🌙 **Dark Theme** - Modern dark interface for comfortable viewing
+- 🔄 **Real-time Updates** - Shifts sync immediately with Home Assistant calendars
+- 🐳 **Docker Ready** - Easy deployment with Docker and Docker Compose
 
-- Docker und Docker Compose installiert
-- Home Assistant mit Long-Lived Access Token
-- Kalender-Entities in Home Assistant erstellt
+## Quick Start
 
-### Schnellstart
+### Prerequisites
 
-1. **Repository klonen oder Dateien herunterladen**
+- Docker and Docker Compose installed
+- Home Assistant instance with Long-Lived Access Token
+- Calendar entities created in Home Assistant
 
-2. **Umgebungsvariablen konfigurieren**
+### Installation
 
-   ```bash
-   cp .env.example .env
-   ```
-
-   Bearbeite die `.env` Datei mit deinen Werten:
-
-   - `HA_URL`: Die URL deiner Home Assistant Instanz
-   - `HA_TOKEN`: Dein Long-Lived Access Token
-   - `CALENDAR_ENTITY_IDS`: JSON-Objekt mit Namen und Kalender-Entity-IDs
-
-3. **Shifts-Konfiguration anpassen**
-   Bearbeite `shifts_config.json` mit deinen Schichtzeiten
-
-4. **Container starten**
+1. **Clone the repository**
 
    ```bash
-   docker-compose up -d
+   git clone https://github.com/panteLx/hass-shift-planner.git
+   cd hass-shift-planner
    ```
 
-5. **Zugriff auf die Anwendung**
-   Öffne http://localhost:3000 in deinem Browser
+2. **Configure environment variables**
 
-### Docker Compose verwenden
+   Create a `.env` file in the root directory:
 
-Mit docker-compose (empfohlen):
+   ```env
+   # Home Assistant Configuration
+   HA_URL=http://homeassistant.local:8123
+   HA_TOKEN=your_long_lived_access_token_here
+   CALENDAR_ENTITY_IDS={"Name 1":"calendar.name1","Name 2":"calendar.name2"}
+
+   # Optional: Server Configuration (defaults shown)
+   HOST=0.0.0.0
+   PORT=3000
+   ```
+
+   **Environment Variables:**
+
+   - `HA_URL`: Your Home Assistant URL
+   - `HA_TOKEN`: Long-Lived Access Token from Home Assistant
+   - `CALENDAR_ENTITY_IDS`: JSON object mapping person names to calendar entity IDs
+   - `HOST`: Server host address (default: 0.0.0.0)
+   - `PORT`: Server port (default: 3000)
+
+3. **Configure shift types**
+
+   Edit `shifts_config.json` with your shift times:
+
+   ```json
+   {
+     "Name 1": {
+       "Shift 1": {
+         "start": "06:00:00",
+         "end": "14:00:00"
+       },
+       "Shift 2": {
+         "start": "14:00:00",
+         "end": "22:00:00"
+       },
+       "Shift 3": {
+         "start": "22:00:00",
+         "end": "06:00:00"
+       }
+     },
+     "Name 2": {
+       "Shift 1 ": {
+         "start": "07:00:00",
+         "end": "15:00:00"
+       },
+       "Shift 2": {
+         "start": "15:00:00",
+         "end": "23:00:00"
+       }
+     }
+   }
+   ```
+
+4. **Start the application**
+
+   ```bash
+   docker compose up -d
+   ```
+
+5. **Access the application**
+
+   Open http://localhost:3000 in your browser
+
+## Usage
+
+### Planning Shifts
+
+1. **Select a person** from the dropdown menu
+2. **Select a shift type** from the available options
+3. **Click on calendar days** to add shifts
+4. Click again on a day to remove that specific shift
+5. **Submit planned shifts** to sync with Home Assistant
+
+### Color Coding
+
+The calendar automatically color-codes shifts:
+
+- **Früh/Frühschicht** (Early shift) - Green
+- **Spät/Spätschicht** (Late shift) - Orange
+- **Nacht/Nachtschicht** (Night shift) - Indigo
+- **Custom shifts** - Automatically generated consistent colors
+
+The legend below the calendar shows all active shift types with their colors.
+
+### Multi-Person Planning
+
+- Switch between people using the dropdown
+- Previously planned shifts are preserved when switching
+- Each person's shifts are displayed with their initials
+- Multiple shifts can exist on the same day
+
+## Docker Commands
+
+### Using Docker Compose (Recommended)
 
 ```bash
-docker-compose up -d
+# Start in background
+docker compose up -d
+
+# Start with rebuild
+docker compose up --build
+
+# Stop containers
+docker compose down
+
+# View logs
+docker compose logs -f
+
+# Restart
+docker compose restart
 ```
 
-Container stoppen:
+### Using Docker Only
+
+Build the image:
 
 ```bash
-docker-compose down
+docker build -t hass-shift-planner .
 ```
 
-Logs anzeigen:
-
-```bash
-docker-compose logs -f
-```
-
-### Nur Docker (ohne Compose)
-
-Image bauen:
-
-```bash
-docker build -t hass-import-shifts .
-```
-
-Container starten:
+Run the container:
 
 ```bash
 docker run -d \
-  --name hass-import-shifts \
+  --name hass-shift-planner \
   -p 3000:3000 \
+  -e HOST=0.0.0.0 \
+  -e PORT=3000 \
   -e HA_URL=http://homeassistant.local:8123 \
   -e HA_TOKEN=your_token_here \
-  -e CALENDAR_ENTITY_IDS='{"name1":"calendar.name1"}' \
+  -e CALENDAR_ENTITY_IDS='{"Name 1":"calendar.name1", "Name 2":"calendar.name2"}' \
   -v $(pwd)/shifts_config.json:/app/shifts_config.json:ro \
-  hass-import-shifts
+  hass-shift-planner
 ```
 
-## Konfiguration
-
-### Environment Variables
-
-- `HOST`: Host-Adresse (Standard: 0.0.0.0)
-- `PORT`: Port (Standard: 3000)
-- `HA_URL`: Home Assistant URL
-- `HA_TOKEN`: Home Assistant Long-Lived Access Token
-- `CALENDAR_ENTITY_IDS`: JSON mit Name-zu-Calendar-Entity Mapping
+## Configuration Files
 
 ### shifts_config.json
 
-Beispiel:
+Defines shift times for each person and shift type. Structure:
 
 ```json
 {
-  "name1": {
-    "frühschicht": {
-      "start": "06:00:00",
-      "end": "14:00:00"
-    },
-    "spätschicht": {
-      "start": "14:00:00",
-      "end": "22:00:00"
+  "PersonName": {
+    "ShiftType": {
+      "start": "HH:MM:SS",
+      "end": "HH:MM:SS"
     }
   }
 }
@@ -110,20 +185,75 @@ Beispiel:
 
 ## Troubleshooting
 
-Container-Logs anzeigen:
+### Check Container Logs
 
 ```bash
-docker logs hass-import-shifts
+docker compose logs -f
+docker logs hass-shift-planner
 ```
 
-Container neu starten:
+### Verify Environment Variables
 
 ```bash
-docker restart hass-import-shifts
+docker compose config
 ```
 
-Container mit interaktiver Shell:
+### Interactive Container Shell
 
 ```bash
-docker exec -it hass-import-shifts sh
+docker exec -it hass-shift-planner sh
 ```
+
+### Common Issues
+
+**Port already in use:**
+
+- Change `PORT` in `.env` file
+- Restart: `docker compose up -d`
+
+**Calendar not updating:**
+
+- Verify `HA_TOKEN` is valid
+- Check `CALENDAR_ENTITY_IDS` match your Home Assistant setup
+- Ensure calendar entities exist in Home Assistant
+
+**Configuration not loading:**
+
+- Verify `shifts_config.json` is valid JSON
+- Check file permissions
+- Restart container: `docker compose restart`
+
+## Development
+
+### Local Development (without Docker)
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create `.env` file with configuration
+
+3. Start development server:
+
+   ```bash
+   npm start
+   ```
+
+4. Access at http://localhost:3000
+
+## Technology Stack
+
+- **Backend**: Node.js, Express
+- **Frontend**: Vanilla JavaScript, HTML5, CSS3
+- **Container**: Docker, Docker Compose
+- **Integration**: Home Assistant REST API
+
+## License
+
+MIT
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.

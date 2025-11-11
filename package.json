@@ -4,7 +4,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
   },
-  "name": "hass-import-shifts",
+  "name": "hass-shift-planner",
   "version": "1.0.0",
   "main": "app.js",
   "devDependencies": {},
