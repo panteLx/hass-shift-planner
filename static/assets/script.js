@@ -177,6 +177,12 @@ const setupCalendarImport = () => {
       return;
     }
 
+    // Button deaktivieren, um Mehrfachimporte zu verhindern
+    importBtn.disabled = true;
+    const originalText =
+      importBtn.querySelector("#import-btn-text").textContent;
+    importBtn.querySelector("#import-btn-text").textContent = "Importiere...";
+
     try {
       const response = await fetch("/add_shifts", {
         method: "POST",
@@ -203,6 +209,10 @@ const setupCalendarImport = () => {
     } catch (error) {
       console.error("Fehler:", error);
       showToast("Fehler beim Import", "error");
+    } finally {
+      // Button wieder aktivieren
+      importBtn.disabled = plannedShifts.length === 0;
+      importBtn.querySelector("#import-btn-text").textContent = originalText;
     }
   });
 };
